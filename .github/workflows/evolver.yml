@@ -21,7 +21,7 @@ jobs:
         id: evolver
         uses: mmrzaf/evolver@v1
         with:
-          mode: pr
+          mode: push
           provider: gemini
           model: gemini-2.5-flash-lite
           workdir: .

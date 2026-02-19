@@ -1,14 +1,9 @@
 name: evolver
 
 on:
-  workflow_dispatch:
-    inputs:
-      note:
-        description: "Optional note for this evolution run"
-        required: false
-        default: ""
+  workflow_dispatch: {}
   schedule:
-    - cron: "22 22 * * *"
+    - cron: "17 3 * * *"
 
 permissions:
   contents: write
@@ -22,7 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run evolver
-        uses: mmrzaf/evolver@v1.0.0
+        id: evolver
+        uses: mmrzaf/evolver@v1.0.1
         with:
           mode: push
           provider: gemini
@@ -31,10 +27,13 @@ jobs:
           allow_workflow_edits: "false"
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
           repo_goal: >
-            Build evolved-commit, a zero-configuration CLI that ensures every Git commit is review-ready
-            by installing safe Git hooks and running fast, opinionated checks with exact fix guidance.
-            Changes are pushed directly to the default branch. One atomic improvement per change.
-            Tests, docs, and changelog are mandatory. Offline, deterministic, fast.
+            Build evolved-commit, a zero-configuration CLI that ensures every Git commit
+            is review-ready by installing safe Git hooks and running fast, opinionated
+            checks with exact fix guidance.
+            Changes are pushed directly to the default branch.
+            One atomic improvement per change.
+            Tests, docs, and changelog are mandatory.
+            Offline, deterministic, fast.
             Always explain why + exact fix steps.
           commands: |
             go test ./...

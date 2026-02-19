@@ -1,0 +1,37 @@
+name: evolver
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "22 22 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: evolver-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  evolve:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run evolver
+        id: evolver
+        uses: mmrzaf/evolver@v1
+        with:
+          mode: pr
+          provider: gemini
+          model: gemini-2.5-flash-lite
+          workdir: .
+          allow_workflow_edits: "false"
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          repo_goal: >
+            Build evolved-commit, a zero-configuration CLI that ensures every Git commit is review-ready
+            by installing safe Git hooks and running fast, opinionated checks with exact fix guidance.
+            All changes via PRs. One atomic improvement per PR. Tests, docs, changelog required.
+            Offline, deterministic, fast. Always explain why + exact fix steps.
+          commands: |
+            go test ./...
+            go vet ./...

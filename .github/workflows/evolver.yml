@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run evolver
-        uses: mmrzaf/evolver@v1
+        uses: mmrzaf/evolver@v1.0.0
         with:
           mode: push
           provider: gemini

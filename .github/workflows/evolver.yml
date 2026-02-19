@@ -1,13 +1,17 @@
 name: evolver
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      note:
+        description: "Optional note for this evolution run"
+        required: false
+        default: ""
   schedule:
     - cron: "22 22 * * *"
 
 permissions:
   contents: write
-  pull-requests: write
 
 concurrency:
   group: evolver-${{ github.repository }}
@@ -18,7 +22,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run evolver
-        id: evolver
         uses: mmrzaf/evolver@v1
         with:
           mode: push
@@ -30,8 +33,9 @@ jobs:
           repo_goal: >
             Build evolved-commit, a zero-configuration CLI that ensures every Git commit is review-ready
             by installing safe Git hooks and running fast, opinionated checks with exact fix guidance.
-            All changes via PRs. One atomic improvement per PR. Tests, docs, changelog required.
-            Offline, deterministic, fast. Always explain why + exact fix steps.
+            Changes are pushed directly to the default branch. One atomic improvement per change.
+            Tests, docs, and changelog are mandatory. Offline, deterministic, fast.
+            Always explain why + exact fix steps.
           commands: |
             go test ./...
             go vet ./...

@@ -1,0 +1,27 @@
+provider: gemini
+mode: push
+model: gemini-2.5-flash
+repo_goal: |
+    Build evolved-commit, a zero-configuration CLI that ensures every Git commit is review-ready by installing safe Git hooks and running fast, opinionated checks with exact fix guidance. Changes are pushed directly to the default branch. One atomic improvement per change. Tests, docs, and changelog are mandatory. Offline, deterministic, fast. Always explain why + exact fix steps.
+workdir: .
+budgets:
+    max_files_changed: 20
+    max_lines_changed: 3000
+    max_new_files: 20
+commands:
+    - go test ./...
+    - go vet ./...
+allow_paths:
+    - .
+deny_paths:
+    - .git/
+    - .github/workflows/
+    - node_modules/
+security:
+    allow_workflow_edits: false
+    secret_scan: true
+reliability:
+    state_file: .evolver/state.json
+    run_log_file: .evolver/runs.log
+    lock_file: .evolver/run.lock
+    lock_stale_minutes: 180

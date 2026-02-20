@@ -12,6 +12,7 @@ concurrency:
   group: evolver-${{ github.repository }}
   cancel-in-progress: false
 
+
 jobs:
   evolve:
     runs-on: ubuntu-latest
@@ -19,14 +20,15 @@ jobs:
       - name: Run evolver
         id: evolver
         uses: mmrzaf/evolver@v1.0.1
+        env:
+          EVOLVER_MAX_FILES: "20"
+          EVOLVER_MAX_LINES: "3000"
+          EVOLVER_MAX_NEW_FILES: "20"
         with:
           mode: push
           provider: gemini
-          model: gemini-2.5-flash-lite
+          model: gemini-2.5-flash
           workdir: .
-          max_files_changed: 20
-          max_lines_changed: 3000
-          max_new_files: 20
           allow_workflow_edits: "false"
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
           repo_goal: >

@@ -1,1 +1,1 @@
-No specific roadmap update, this change is a foundational step towards 'CLI: install / uninstall / run / explain' under 'Core Capabilities'.
+Core Capabilities: CLI: install / uninstall / run / explain - Initialized CLI framework with Cobra.

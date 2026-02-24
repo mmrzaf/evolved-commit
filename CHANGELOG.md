@@ -8,3 +8,5 @@ All notable changes to this project are documented here.
 - Repository bootstrapped
 
 - Initialize Go module and basic CLI structure (`main.go`)
+
+- Introduce `cobra` for CLI framework and basic root command structure.

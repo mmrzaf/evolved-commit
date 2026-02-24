@@ -1,14 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"os"
+	"evolved-commit/cmd"
 )
 
 func main() {
-	// Placeholder for the main CLI application logic.
-	// This will be expanded to handle commands like install, uninstall, run, explain.
-	fmt.Println("evolved-commit: make every Git commit review-ready.")
-	fmt.Println("Use 'evolved-commit help' for usage details (when implemented).")
-	os.Exit(0)
+	// Execute the root command of the CLI application.
+	// All errors are handled by Cobra's default error handler, including exiting on failure.
+	cmd.Execute()
 }

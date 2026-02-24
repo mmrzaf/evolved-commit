@@ -1,27 +1,32 @@
-provider: gemini
-mode: push
-model: gemini-2.5-flash
-repo_goal: |
-    Build evolved-commit, a zero-configuration CLI that ensures every Git commit is review-ready by installing safe Git hooks and running fast, opinionated checks with exact fix guidance. Changes are pushed directly to the default branch. One atomic improvement per change. Tests, docs, and changelog are mandatory. Offline, deterministic, fast. Always explain why + exact fix steps.
-workdir: .
-budgets:
-    max_files_changed: 20
-    max_lines_changed: 3000
-    max_new_files: 20
-commands:
-    - go test ./...
-    - go vet ./...
-allow_paths:
-    - .
-deny_paths:
-    - .git/
-    - .github/workflows/
-    - node_modules/
-security:
-    allow_workflow_edits: false
-    secret_scan: true
-reliability:
-    state_file: .evolver/state.json
-    run_log_file: .evolver/runs.log
-    lock_file: .evolver/run.lock
-    lock_stale_minutes: 180
+repair:
+  max_attempts: 2
+  max_actions_per_attempt: 2
+  capabilities:
+    - id: go_mod_tidy
+      description: Sync go.mod and go.sum after dependency or import changes
+      argv: ["go", "mod", "tidy"]
+      timeout_seconds: 120
+      max_runs_per_attempt: 1
+      allowed_failure_kinds:
+        - dependency_manifest_missing
+        - dependency_fetch
+
+    - id: go_test_mod_readonly
+      description: Verify module graph is clean and no implicit dependency edits are needed
+      argv: ["go", "test", "-mod=readonly", "./..."]
+      timeout_seconds: 180
+      max_runs_per_attempt: 1
+      allowed_failure_kinds:
+        - dependency_manifest_missing
+        - compile_failure
+        - test_failure
+        - unknown_failure
+
+    - id: go_generate
+      description: Regenerate code/assets for repos that rely on go generate
+      argv: ["go", "generate", "./..."]
+      timeout_seconds: 180
+      max_runs_per_attempt: 1
+      allowed_failure_kinds:
+        - compile_failure
+        - test_failure

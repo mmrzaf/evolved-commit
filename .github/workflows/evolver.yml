@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Run evolver
         id: evolver
-        uses: mmrzaf/evolver@v1.1.0
+        uses: mmrzaf/evolver@latest
         env:
           EVOLVER_MAX_FILES: "20"
           EVOLVER_MAX_LINES: "3000"

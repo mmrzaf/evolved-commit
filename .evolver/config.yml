@@ -25,8 +25,9 @@ repair:
       max_runs_per_attempt: 1
       allowed_failure_kinds:
         - dependency_manifest_missing
+        - dependency_manifest_invalid
+        - dependency_resolution
         - dependency_fetch
-
 allow_paths:
   - .
 

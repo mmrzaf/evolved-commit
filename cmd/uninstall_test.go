@@ -42,7 +42,7 @@ func TestUninstallCommand(t *testing.T) {
 	// Restore original stdout
 	os.Stdout = oldStdout
 
-	expected := "uninstall called: This will remove Git hooks."
+	expected := "Git hooks uninstalled successfully."
 	if !strings.Contains(string(capturedOutput), expected) {
 		t.Errorf("Expected output to contain \"%s\", got \"%s\"", expected, strings.TrimSpace(string(capturedOutput)))
 	}

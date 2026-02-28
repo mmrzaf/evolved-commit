@@ -42,7 +42,7 @@ func TestInstallCommand(t *testing.T) {
 	// Restore original stdout
 	os.Stdout = oldStdout
 
-	expected := "install called: This will install Git hooks."
+	expected := "Git hooks installed successfully."
 	if !strings.Contains(string(capturedOutput), expected) {
 		t.Errorf("Expected output to contain \"%s\", got \"%s\"", expected, strings.TrimSpace(string(capturedOutput)))
 	}

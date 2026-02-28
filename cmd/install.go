@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"evolved-commit/pkg/githooks"
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -14,7 +16,13 @@ var installCmd = &cobra.Command{
 to enable evolved-commit's automatic checks on commit messages,
 branch names, and staged diffs.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("install called: This will install Git hooks.")
+		fmt.Println("Attempting to install Git hooks...")
+		err := githooks.Install("") // Pass empty string to let githooks find the repo
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error installing Git hooks: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Println("Git hooks installed successfully.")
 	},
 }
 

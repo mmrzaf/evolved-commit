@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"evolved-commit/pkg/githooks"
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -13,7 +15,13 @@ var uninstallCmd = &cobra.Command{
 	Long: `The uninstall command removes any Git hooks previously installed by
 evolved-commit from your repository, disabling its automatic checks.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("uninstall called: This will remove Git hooks.")
+		fmt.Println("Attempting to uninstall Git hooks...")
+		err := githooks.Uninstall("") // Pass empty string to let githooks find the repo
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error uninstalling Git hooks: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Println("Git hooks uninstalled successfully.")
 	},
 }
 

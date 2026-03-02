@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -58,31 +59,109 @@ func TestFindGitDir(t *testing.T) {
 
 func TestInstall(t *testing.T) {
 	repoPath := setupTestRepo(t)
+	hooksDir := filepath.Join(repoPath, ".git", "hooks")
+	hookPath := filepath.Join(hooksDir, PreCommitHook)
+
+	// Ensure hook file does not exist initially
+	if _, err := os.Stat(hookPath); err == nil {
+		t.Fatalf("Hook file %s should not exist before install", hookPath)
+	}
 
 	err := Install(repoPath)
 	if err != nil {
-		t.Errorf("Install failed: %v", err)
+		t.Fatalf("Install failed: %v", err)
 	}
 
-	// Future: Check if hook file exists and has correct content
+	// Check if hook file exists
+	if _, err := os.Stat(hookPath); os.IsNotExist(err) {
+		t.Errorf("Expected %s hook file to be created, but it does not exist", PreCommitHook)
+	}
+
+	// Check content of the hook file
+	content, err := os.ReadFile(hookPath)
+	if err != nil {
+		t.Fatalf("Failed to read hook file: %v", err)
+	}
+	if string(content) != HookScriptContent {
+		t.Errorf("Expected hook content\n%q\n got\n%q", HookScriptContent, string(content))
+	}
+
+	// Test installing again (idempotency check)
+	err = Install(repoPath)
+	if err != nil {
+		t.Fatalf("Second Install failed: %v", err)
+	}
+	// Content should still be the same
+	content, err = os.ReadFile(hookPath)
+	if err != nil {
+		t.Fatalf("Failed to read hook file after second install: %v", err)
+	}
+	if string(content) != HookScriptContent {
+		t.Errorf("Expected hook content to be idempotent, got\n%q", string(content))
+	}
 }
 
 func TestUninstall(t *testing.T) {
 	repoPath := setupTestRepo(t)
-
-	// First install a dummy hook to ensure uninstall has something to remove
-	// This is a placeholder for now, actual hook creation will be added later.
 	hooksDir := filepath.Join(repoPath, ".git", "hooks")
-	os.MkdirAll(hooksDir, 0755)
-	dummyHookPath := filepath.Join(hooksDir, "pre-commit")
-	os.WriteFile(dummyHookPath, []byte("#!/bin/sh\necho 'dummy hook'"), 0755)
+	hookPath := filepath.Join(hooksDir, PreCommitHook)
 
-	err := Uninstall(repoPath)
+	// Install the hook first
+	err := Install(repoPath)
 	if err != nil {
-		t.Errorf("Uninstall failed: %v", err)
+		t.Fatalf("Failed to install hook for uninstall test: %v", err)
 	}
 
-	// Future: Check if hook file is removed or content is reverted
+	// Ensure hook file exists before uninstall
+	if _, err := os.Stat(hookPath); os.IsNotExist(err) {
+		t.Fatalf("Hook file %s should exist before uninstall", hookPath)
+	}
+
+	err = Uninstall(repoPath)
+	if err != nil {
+		t.Fatalf("Uninstall failed: %v", err)
+	}
+
+	// Check if hook file is removed
+	if _, err := os.Stat(hookPath); !os.IsNotExist(err) {
+		t.Errorf("Expected %s hook file to be removed, but it still exists", PreCommitHook)
+	}
+
+	// Test uninstalling again (idempotency check - no error if already gone)
+	err = Uninstall(repoPath)
+	if err != nil {
+		t.Fatalf("Second Uninstall failed: %v", err)
+	}
+
+	// Test uninstalling a non-evolved-commit hook
+	otherHookPath := filepath.Join(hooksDir, "post-commit")
+	otherContent := "#!/bin/sh\necho 'another hook'\n"
+	os.WriteFile(otherHookPath, []byte(otherContent), 0755)
+	err = Uninstall(repoPath) // Uninstall still tries to remove PreCommitHook, not otherHookPath
+	if err != nil {
+		// Should not error if the target hook for uninstall doesn't exist, as the method is for pre-commit
+		// However, this test specifically checks for the *pre-commit* hook. The check below is more relevant.
+	}
+	// Verify the other hook is still there
+	if _, err := os.Stat(otherHookPath); os.IsNotExist(err) {
+		t.Errorf("Expected other hook %s to remain after uninstall, but it was removed", otherHookPath)
+	}
+
+	// Test uninstalling an evolved-commit hook that was modified
+	err = Install(repoPath) // Re-install our hook
+	if err != nil {
+		t.Fatalf("Failed to reinstall hook for modified test: %v", err)
+	}
+	modifiedContent := "#!/bin/sh\necho 'user modified hook'\n"
+	os.WriteFile(hookPath, []byte(modifiedContent), 0755) // Modify it
+
+	err = Uninstall(repoPath)
+	if err == nil || !strings.Contains(err.Error(), "appears modified") {
+		t.Errorf("Expected uninstall to fail for modified hook with 'appears modified' error, got: %v", err)
+	}
+	if _, err := os.Stat(hookPath); os.IsNotExist(err) {
+		t.Errorf("Expected modified hook to NOT be removed, but it was.")
+	}
 }
 
 func TestInstall_NoGitDir(t *testing.T) {

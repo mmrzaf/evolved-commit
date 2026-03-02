@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Implement actual `pre-commit` Git hook installation, writing a script that calls `evolved-commit run`.
+- Implement actual `pre-commit` Git hook uninstallation, safely removing only evolved-commit-managed hooks.
 - Introduce `pkg/githooks` package with `Install` and `Uninstall` stubs and Git directory discovery logic.
 - Integrate `pkg/githooks` into `install` and `uninstall` commands.
 - Implement `findGitDir` utility function to locate `.git` directory.
@@ -16,3 +18,6 @@ All notable changes to this project are documented here.
 - Introduce `pkg/githooks` package with `Install` and `Uninstall` stubs and Git directory discovery logic.
 - Integrate `pkg/githooks` into `install` and `uninstall` commands.
 - Implement `findGitDir` utility function to locate `.git` directory.
+
+- Implement actual `pre-commit` Git hook installation, writing a script that calls `evolved-commit run`.
+- Implement actual `pre-commit` Git hook uninstallation, safely removing only evolved-commit-managed hooks.

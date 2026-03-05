@@ -1,1 +1,1 @@
-Core Capabilities: CLI: install (Implemented - Git dir discovery & pre-commit hook creation) / uninstall (Implemented - Git dir discovery & pre-commit hook removal) / run (Implemented - Basic stub) / explain - Initialized CLI framework with Cobra.
+Core Capabilities: CLI: install (Implemented - Git dir discovery & pre-commit hook creation) / uninstall (Implemented - Git dir discovery & pre-commit hook removal) / run (Implemented - Basic stub, now with commit message subject not empty check) / explain (Planned - Rule explanation) - Initialized CLI framework with Cobra.

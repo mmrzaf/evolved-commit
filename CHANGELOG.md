@@ -17,3 +17,6 @@ All notable changes to this project are documented here.
 - Repository bootstrapped.
 
 - Introduce `run` subcommand with a basic stub functionality and test.
+
+- Introduce `pkg/checks` package and initial `CheckCommitMessageSubjectNotEmpty` rule.
+- Update `run` subcommand to execute commit message subject checks when a commit message file is provided.

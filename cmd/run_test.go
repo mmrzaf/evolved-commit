@@ -82,7 +82,7 @@ func TestRunCommand(t *testing.T) {
 		t.Errorf("Expected os.Exit(0) but got %d", capturedExitCode)
 	}
 
-	expectedStdout := "evolved-commit run: Running checks (not yet implemented)."
+	expectedStdout := "evolved-commit run: No commit message file provided. Running general checks (not yet implemented)."
 	if !strings.Contains(string(capturedOutput), expectedStdout) {
 		t.Errorf("Expected stdout to contain \"%s\", got \"%s\"", expectedStdout, strings.TrimSpace(string(capturedOutput)))
 	}

@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Introduce `explain` subcommand to provide detailed explanations for rules.
 - Introduce `run` subcommand with a basic stub functionality and test.
 - Implement actual `pre-commit` Git hook installation, writing a script that calls `evolved-commit run`.
 - Implement actual `pre-commit` Git hook uninstallation, safely removing only evolved-commit-managed hooks.
@@ -20,3 +21,5 @@ All notable changes to this project are documented here.
 
 - Introduce `pkg/checks` package and initial `CheckCommitMessageSubjectNotEmpty` rule.
 - Update `run` subcommand to execute commit message subject checks when a commit message file is provided.
+
+- Introduce `explain` subcommand to provide detailed explanations for rules.

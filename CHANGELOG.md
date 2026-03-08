@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Introduce `CheckCommitMessageSubjectLength` rule, integrate into `run` command, and add its explanation to `explain` subcommand.
 - Introduce `explain` subcommand to provide detailed explanations for rules.
 - Introduce `run` subcommand with a basic stub functionality and test.
 - Implement actual `pre-commit` Git hook installation, writing a script that calls `evolved-commit run`.
@@ -23,3 +24,5 @@ All notable changes to this project are documented here.
 - Update `run` subcommand to execute commit message subject checks when a commit message file is provided.
 
 - Introduce `explain` subcommand to provide detailed explanations for rules.
+
+- Introduce `CheckCommitMessageSubjectLength` rule, integrate into `run` command, and add its explanation to `explain` subcommand.

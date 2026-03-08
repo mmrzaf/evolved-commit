@@ -39,13 +39,21 @@ func runCommandLogic(cmd *cobra.Command, args []string, exit func(code int)) {
 		commitMessage := string(content)
 		subjectLine := strings.SplitN(commitMessage, "\n", 2)[0] // Get the first line
 
-		fmt.Println("Running commit message checks...")
+		// fmt.Println("Running commit message checks...") // Removed as per test expectation
+		// Run subject not empty check
 		if err := checks.CheckCommitMessageSubjectNotEmpty(subjectLine); err != nil {
 			fmt.Fprintf(os.Stderr, "Commit message check failed:\n%v\n", err)
 			exit(1)
 			return
 		}
-		fmt.Println("Commit message checks passed.")
+		// Run subject length check
+		if err := checks.CheckCommitMessageSubjectLength(subjectLine); err != nil {
+			fmt.Fprintf(os.Stderr, "Commit message check failed:\n%v\n", err)
+			exit(1)
+			return
+		}
+
+		// fmt.Println("Commit message checks passed.") // Removed as per test expectation
 		exit(0)
 		return
 	}

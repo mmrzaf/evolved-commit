@@ -18,7 +18,8 @@ exact steps on how to fix a violation.
 
 Usage:
   evolved-commit explain commit-message-subject-not-empty
-  evolved-commit explain commit-message-subject-length`,
+  evolved-commit explain commit-message-subject-length
+  evolved-commit explain commit-message-subject-no-trailing-period`,
 	Args: cobra.ExactArgs(1), // Expect exactly one argument: the rule name
 	Run: func(cmd *cobra.Command, args []string) {
 		explainCommandLogic(cmd, args, os.Exit)
@@ -71,6 +72,26 @@ Example:
   (This is 50 characters)
   git commit -m "refactor: Optimize data fetching"
   (This is 30 characters)`) 
+			exit(0)
+		case "commit-message-subject-no-trailing-period":
+			fmt.Println(`Rule: Commit Message Subject No Trailing Period
+
+Purpose:
+To keep commit subjects clean, concise, and consistent, they should not
+end with a period.
+
+Why it's important:
+Periods at the end of subject lines are often considered superfluous in
+this context, as the subject is a title, not a sentence. Omitting them
+contributes to a consistent and scan-friendly commit history.
+
+How to fix:
+Remove any trailing period from the first line of your commit message.
+Example:
+  git commit -m "fix: Corrected a critical bug in user authentication"
+  (This is incorrect because of the trailing period)
+  git commit -m "fix: Correct a critical bug in user authentication"
+  (This is correct)`) 
 			exit(0)
 		default:
 			fmt.Fprintf(os.Stderr, "Error: Unknown rule '%s'. Use 'evolved-commit explain --help' for available rules.\n", ruleName)

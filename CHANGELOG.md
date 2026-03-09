@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Introduce `CheckCommitMessageSubjectNoTrailingPeriod` rule, integrate into `run` command, and add its explanation to `explain` subcommand.
 - Introduce `CheckCommitMessageSubjectLength` rule, integrate into `run` command, and add its explanation to `explain` subcommand.
 - Introduce `explain` subcommand to provide detailed explanations for rules.
 - Introduce `run` subcommand with a basic stub functionality and test.
@@ -26,3 +27,5 @@ All notable changes to this project are documented here.
 - Introduce `explain` subcommand to provide detailed explanations for rules.
 
 - Introduce `CheckCommitMessageSubjectLength` rule, integrate into `run` command, and add its explanation to `explain` subcommand.
+
+- Introduce `CheckCommitMessageSubjectNoTrailingPeriod` rule, integrate into `run` command, and add its explanation to `explain` subcommand.

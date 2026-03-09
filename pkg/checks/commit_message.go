@@ -12,6 +12,9 @@ var ErrCommitMessageSubjectEmpty = errors.New("commit message subject cannot be 
 // ErrCommitMessageSubjectTooLong indicates that the commit message subject line exceeds the maximum allowed length.
 var ErrCommitMessageSubjectTooLong = errors.New("commit message subject is too long")
 
+// ErrCommitMessageSubjectTrailingPeriod indicates that the commit message subject line ends with a period.
+var ErrCommitMessageSubjectTrailingPeriod = errors.New("commit message subject should not end with a period")
+
 const MaxSubjectLength = 50
 
 // CheckCommitMessageSubjectNotEmpty validates that the commit message subject line is not empty.
@@ -30,6 +33,16 @@ func CheckCommitMessageSubjectLength(subjectLine string) error {
 	trimmedSubject := strings.TrimSpace(subjectLine)
 	if len(trimmedSubject) > MaxSubjectLength {
 		return fmt.Errorf("%w: The first line of your commit message is %d characters long, but it should not exceed %d characters.\nFix: Shorten your commit message subject line to be %d characters or less.", ErrCommitMessageSubjectTooLong, len(trimmedSubject), MaxSubjectLength, MaxSubjectLength)
+	}
+	return nil
+}
+
+// CheckCommitMessageSubjectNoTrailingPeriod validates that the commit message subject line does not end with a period.
+// It returns an error if the subject ends with a period, providing a clear explanation and fix guidance.
+func CheckCommitMessageSubjectNoTrailingPeriod(subjectLine string) error {
+	trimmedSubject := strings.TrimSpace(subjectLine)
+	if strings.HasSuffix(trimmedSubject, ".") {
+		return fmt.Errorf("%w: The first line of your commit message ends with a period.\nFix: Remove the trailing period from the subject line. Example: 'feat: Add user authentication'", ErrCommitMessageSubjectTrailingPeriod)
 	}
 	return nil
 }

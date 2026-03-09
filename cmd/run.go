@@ -52,6 +52,12 @@ func runCommandLogic(cmd *cobra.Command, args []string, exit func(code int)) {
 			exit(1)
 			return
 		}
+		// Run subject no trailing period check
+		if err := checks.CheckCommitMessageSubjectNoTrailingPeriod(subjectLine); err != nil {
+			fmt.Fprintf(os.Stderr, "Commit message check failed:\n%v\n", err)
+			exit(1)
+			return
+		}
 
 		// fmt.Println("Commit message checks passed.") // Removed as per test expectation
 		exit(0)

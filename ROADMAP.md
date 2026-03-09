@@ -1,1 +1,1 @@
-run (Implemented - Basic stub, now with commit message subject not empty and subject length checks) / explain (Implemented - Basic rule explanation for commit-message-subject-not-empty and commit-message-subject-length)
+run (Implemented - Basic stub, now with commit message subject not empty, subject length, and subject no trailing period checks) / explain (Implemented - Basic rule explanation for commit-message-subject-not-empty, commit-message-subject-length, and commit-message-subject-no-trailing-period)

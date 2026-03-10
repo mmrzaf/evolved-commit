@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Introduce `CheckCommitMessageSubjectStartsWithUppercase` rule, integrate into `run` command, and add its explanation to `explain` subcommand.
 - Introduce `CheckCommitMessageSubjectNoTrailingPeriod` rule, integrate into `run` command, and add its explanation to `explain` subcommand.
 - Introduce `CheckCommitMessageSubjectLength` rule, integrate into `run` command, and add its explanation to `explain` subcommand.
 - Introduce `explain` subcommand to provide detailed explanations for rules.
@@ -29,3 +30,5 @@ All notable changes to this project are documented here.
 - Introduce `CheckCommitMessageSubjectLength` rule, integrate into `run` command, and add its explanation to `explain` subcommand.
 
 - Introduce `CheckCommitMessageSubjectNoTrailingPeriod` rule, integrate into `run` command, and add its explanation to `explain` subcommand.
+
+- Introduce `CheckCommitMessageSubjectStartsWithUppercase` rule, integrate into `run` command, and add its explanation to `explain` subcommand.

@@ -88,7 +88,6 @@ func TestCheckCommitMessageSubjectLength(t *testing.T) {
 				if !strings.Contains(err.Error(), tt.errMsgPart) {
 					t.Errorf("CheckCommitMessageSubjectLength() error message \"%s\" did not contain \"%s\"", err.Error(), tt.errMsgPart)
 				}
-				// Check for specific length information in the error message
 				expectedLengthInfo := fmt.Sprintf("is %d characters long, but it should not exceed %d characters", len(strings.TrimSpace(tt.subject)), MaxSubjectLength)
 				if !strings.Contains(err.Error(), expectedLengthInfo) {
 					t.Errorf("CheckCommitMessageSubjectLength() error message \"%s\" did not contain expected length info \"%s\"", err.Error(), expectedLengthInfo)
@@ -143,6 +142,62 @@ func TestCheckCommitMessageSubjectNoTrailingPeriod(t *testing.T) {
 			if err != nil && tt.expectedErr {
 				if !strings.Contains(err.Error(), tt.errMsgPart) {
 					t.Errorf("CheckCommitMessageSubjectNoTrailingPeriod() error message \"%s\" did not contain \"%s\"", err.Error(), tt.errMsgPart)
+				}
+			}
+		})
+	}
+}
+
+func TestCheckCommitMessageSubjectStartsWithUppercase(t *testing.T) {
+	tests := []struct {
+		name        string
+		subject     string
+		expectedErr bool
+		errMsgPart  string
+	}{
+		{
+			name:        "Starts with uppercase",
+			subject:     "Feat: Add user authentication",
+			expectedErr: false,
+		},
+		{
+			name:        "Starts with lowercase",
+			subject:     "feat: Add user authentication",
+			expectedErr: true,
+			errMsgPart:  "commit message subject should start with an uppercase letter",
+		},
+		{
+			name:        "Starts with number",
+			subject:     "1.0.0: Release new version",
+			expectedErr: false,
+		},
+		{
+			name:        "Starts with symbol",
+			subject:     "#: Hotfix for critical bug",
+			expectedErr: false,
+		},
+		{
+			name:        "Empty subject (skipped)",	
+			subject:     "",
+			expectedErr: false, // This check returns nil if subject is empty, as it's handled by NotEmpty check
+		},
+		{
+			name:        "Subject with leading space",
+			subject:     " feat: leading space",
+			expectedErr: true,
+			errMsgPart:  "commit message subject should start with an uppercase letter",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := CheckCommitMessageSubjectStartsWithUppercase(tt.subject)
+			if (err != nil) != tt.expectedErr {
+				t.Errorf("CheckCommitMessageSubjectStartsWithUppercase() error = %v, expectedErr %v", err, tt.expectedErr)
+			}
+			if err != nil && tt.expectedErr {
+				if !strings.Contains(err.Error(), tt.errMsgPart) {
+					t.Errorf("CheckCommitMessageSubjectStartsWithUppercase() error message \"%s\" did not contain \"%s\"", err.Error(), tt.errMsgPart)
 				}
 			}
 		})

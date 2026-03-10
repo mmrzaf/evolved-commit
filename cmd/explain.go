@@ -19,7 +19,8 @@ exact steps on how to fix a violation.
 Usage:
   evolved-commit explain commit-message-subject-not-empty
   evolved-commit explain commit-message-subject-length
-  evolved-commit explain commit-message-subject-no-trailing-period`,
+  evolved-commit explain commit-message-subject-no-trailing-period
+  evolved-commit explain commit-message-subject-starts-with-uppercase`,
 	Args: cobra.ExactArgs(1), // Expect exactly one argument: the rule name
 	Run: func(cmd *cobra.Command, args []string) {
 		explainCommandLogic(cmd, args, os.Exit)
@@ -91,6 +92,30 @@ Example:
   git commit -m "fix: Corrected a critical bug in user authentication"
   (This is incorrect because of the trailing period)
   git commit -m "fix: Correct a critical bug in user authentication"
+  (This is correct)`) 
+			exit(0)
+		case "commit-message-subject-starts-with-uppercase":
+			fmt.Println(`Rule: Commit Message Subject Starts With Uppercase
+
+Purpose:
+A commit message subject should start with an uppercase letter to ensure
+consistency and readability across the commit history.
+
+Why it's important:
+Following a consistent capitalization style for commit subjects makes the
+commit history easier to scan and understand. It's a common convention that
+improves the professional appearance and navigability of version control logs.
+
+How to fix:
+Ensure the first significant character of your commit message subject line is
+an uppercase letter. This applies even if your subject starts with a type prefix
+like 'feat:' or 'fix:'.
+Example:
+  git commit -m "feat: add new user registration flow"
+  (This is incorrect because 'add' starts with a lowercase 'a')
+  git commit -m "Feat: Add new user registration flow"
+  (This is correct)
+  git commit -m "Fix: Correct critical bug"
   (This is correct)`) 
 			exit(0)
 		default:

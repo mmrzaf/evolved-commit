@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"unicode"
 )
 
 // ErrCommitMessageSubjectEmpty indicates that the commit message subject line is empty.
@@ -14,6 +15,9 @@ var ErrCommitMessageSubjectTooLong = errors.New("commit message subject is too l
 
 // ErrCommitMessageSubjectTrailingPeriod indicates that the commit message subject line ends with a period.
 var ErrCommitMessageSubjectTrailingPeriod = errors.New("commit message subject should not end with a period")
+
+// ErrCommitMessageSubjectStartsWithLowercase indicates that the commit message subject line starts with a lowercase letter.
+var ErrCommitMessageSubjectStartsWithLowercase = errors.New("commit message subject should start with an uppercase letter")
 
 const MaxSubjectLength = 50
 
@@ -43,6 +47,21 @@ func CheckCommitMessageSubjectNoTrailingPeriod(subjectLine string) error {
 	trimmedSubject := strings.TrimSpace(subjectLine)
 	if strings.HasSuffix(trimmedSubject, ".") {
 		return fmt.Errorf("%w: The first line of your commit message ends with a period.\nFix: Remove the trailing period from the subject line. Example: 'feat: Add user authentication'", ErrCommitMessageSubjectTrailingPeriod)
+	}
+	return nil
+}
+
+// CheckCommitMessageSubjectStartsWithUppercase validates that the commit message subject line starts with an uppercase letter.
+// It returns an error if the subject starts with a lowercase letter, providing a clear explanation and fix guidance.
+func CheckCommitMessageSubjectStartsWithUppercase(subjectLine string) error {
+	trimmedSubject := strings.TrimSpace(subjectLine)
+	if len(trimmedSubject) == 0 {
+		return nil // This case is covered by CheckCommitMessageSubjectNotEmpty
+	}
+
+	firstChar := rune(trimmedSubject[0])
+	if unicode.IsLower(firstChar) {
+		return fmt.Errorf("%w: The first line of your commit message starts with a lowercase letter. \nFix: Start your commit message subject line with an uppercase letter. Example: 'Feat: Add user authentication'", ErrCommitMessageSubjectStartsWithLowercase)
 	}
 	return nil
 }

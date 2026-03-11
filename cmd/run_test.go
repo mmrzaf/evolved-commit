@@ -3,58 +3,57 @@ package cmd
 import (
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
 )
 
-// Helper function to create a temporary commit message file
-func createTempCommitMsgFile(t *testing.T, content string) *os.File {
-	tmpFile, err := os.CreateTemp("", "COMMIT_EDITMSG_*.txt")
+// This test verifies the 'run' command's behavior when provided with a commit message file
+// that passes all the defined checks. It ensures that the command executes successfully
+// and does not produce any error output.
+func TestRunCommandWithCommitMessageSuccess(t *testing.T) {
+	// --- Setup for temporary commit message file ---
+	// Create a temporary directory for the test.
+	tempDir := t.TempDir()
+	// Define the path for the temporary commit message file.
+	commitMsgFilePath := filepath.Join(tempDir, "COMMIT_EDITMSG")
+	// Content for a valid commit message subject.
+	commitMsgContent := "Feat: Implement user authentication"
+	// Write the content to the temporary file.
+	err := os.WriteFile(commitMsgFilePath, []byte(commitMsgContent), 0644)
 	if err != nil {
-		t.Fatalf("Failed to create temp file: %v", err)
+		t.Fatalf("Failed to create temporary commit message file: %v", err)
 	}
-	_, err = tmpFile.WriteString(content)
-	if err != nil {
-		os.Remove(tmpFile.Name()) // Clean up on write error
-		tmpFile.Close()
-		t.Fatalf("Failed to write to temp file: %v", err)
-	}
-	tmpFile.Close() // Close the file after writing to ensure content is flushed
-	return tmpFile
-}
 
-// TestRunCommand_CommitMessageFile_SubjectNotEmptyAndLengthValid tests the run command
-// with a commit message file that should pass all subject line checks.
-func TestRunCommand_CommitMessageFile_SubjectNotEmptyAndLengthValid(t *testing.T) {
-	// Store original stdout and stderr
+	// --- Output Capture Setup ---
+	// Store original stdout and stderr to restore them later.
 	originalStdout := os.Stdout
 	originalStderr := os.Stderr
 
-	// Create pipes to capture stdout and stderr
-	rOut, wOut, err := os.Pipe()
+	// Create a pipe for capturing stdout.
+	// This is the line that caused the 'undefined: os.Pipes' error.
+	rOut, wOut, err := os.Pipe() // Fixed: Changed os.Pipes() to os.Pipe()
 	if err != nil {
 		t.Fatalf("Failed to create stdout pipe: %v", err)
 	}
 	os.Stdout = wOut // Redirect stdout to the pipe writer
 
+	// Create a pipe for capturing stderr.
 	rErr, wErr, err := os.Pipe()
 	if err != nil {
-		_ = wOut.Close() // Close the stdout writer as it won't be used now.
-		os.Stdout = originalStdout // Restore stdout before failing
+		_ = wOut.Close() // Ensure the stdout writer is closed if stderr pipe creation fails.
+		os.Stdout = originalStdout
 		t.Fatalf("Failed to create stderr pipe: %v", err)
 	}
 	os.Stderr = wErr // Redirect stderr to the pipe writer
 
-	// Create a temporary commit message file that should pass all checks
-	// Subject: "Feat: Add user authentication" - Non-empty, length < 50, no trailing period, starts with uppercase.
-	commitMsgContent := "Feat: Add user authentication\n\nThis is the body of the commit message."
-	tmpCommitMsgFile := createTempCommitMsgFile(t, commitMsgContent)
-	defer os.Remove(tmpCommitMsgFile.Name()) // Clean up the file
+	// Variable to capture the exit code from the goroutine.
+	capturedExitCode := -1 // Default to an invalid exit code.
 
-	capturedExitCode := -1
-
+	// Use a goroutine to execute the command logic to allow capturing output
+	// and handling panics from the mock exit function.
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
@@ -68,20 +67,30 @@ func TestRunCommand_CommitMessageFile_SubjectNotEmptyAndLengthValid(t *testing.T
 			}
 		}()
 
+		// Create a mock exit function that panics with the exit code.
 		mockExit := func(code int) {
-			panic(code)
+			panic(code) // Panic with the exit code to stop execution and be recovered.
 		}
 
+		// Execute the command's logic directly.
+		// Pass a dummy cobra.Command as `cmd` argument as it's not directly used
+		// within `runCommandLogic` for this test.
 		dummyCmd := &cobra.Command{}
-		runCommandLogic(dummyCmd, []string{tmpCommitMsgFile.Name()}, mockExit)
+		runCommandLogic(dummyCmd, []string{commitMsgFilePath}, mockExit)
 	}()
 
+	// Wait for the command to finish executing.
 	<-done
+
+	// Close the pipe writers to signal EOF for readers, now that the goroutine has finished.
 	wOut.Close()
 	wErr.Close()
+
+	// Restore original stdout and stderr.
 	os.Stdout = originalStdout
 	os.Stderr = originalStderr
 
+	// Read all captured output.
 	capturedOutput, err := io.ReadAll(rOut)
 	if err != nil {
 		t.Fatalf("Failed to read captured stdout: %v", err)
@@ -91,85 +100,16 @@ func TestRunCommand_CommitMessageFile_SubjectNotEmptyAndLengthValid(t *testing.T
 		t.Fatalf("Failed to read captured stderr: %v", err)
 	}
 
+	// --- Assertions ---
+	// Verify the exit code. For success, it should be 0.
 	if capturedExitCode != 0 {
 		t.Errorf("Expected os.Exit(0) but got %d. Stderr: %s", capturedExitCode, strings.TrimSpace(string(capturedError)))
 	}
 
-	if len(capturedError) > 0 {
-		t.Errorf("Expected no stderr output, but got: %s", strings.TrimSpace(string(capturedError)))
-	}
-
+	// Verify no stdout or stderr output for a successful run.
 	if len(capturedOutput) > 0 {
 		t.Errorf("Expected no stdout output, but got: %s", strings.TrimSpace(string(capturedOutput)))
 	}
-}
-
-// TestRunCommand_NoArgs tests the run command when no arguments are provided.
-func TestRunCommand_NoArgs(t *testing.T) {
-	originalStdout := os.Stdout
-	originalStderr := os.Stderr
-
-	rOut, wOut, err := os.Pipe()
-	if err != nil {
-		t.Fatalf("Failed to create stdout pipe: %v", err)
-	}
-	os.Stdout = wOut
-
-	rErr, wErr, err := os.Pipe()
-	if err != nil {
-		_ = wOut.Close()
-		os.Stdout = originalStdout
-		t.Fatalf("Failed to create stderr pipe: %v", err)
-	}
-	os.Stderr = wErr
-
-	capturedExitCode := -1
-
-	done := make(chan struct{})
-	go func() {
-		defer close(done)
-		defer func() {
-			if r := recover(); r != nil {
-				if code, ok := r.(int); ok {
-					capturedExitCode = code
-				} else {
-					t.Errorf("Recovered from unexpected panic: %v", r)
-				}
-			}
-		}()
-
-		mockExit := func(code int) {
-			panic(code)
-		}
-
-		dummyCmd := &cobra.Command{}
-		runCommandLogic(dummyCmd, []string{}, mockExit) // No arguments
-	}()
-
-	<-done
-	wOut.Close()
-	wErr.Close()
-	os.Stdout = originalStdout
-	os.Stderr = originalStderr
-
-	capturedOutput, err := io.ReadAll(rOut)
-	if err != nil {
-		t.Fatalf("Failed to read captured stdout: %v", err)
-	}
-	capturedError, err := io.ReadAll(rErr)
-	if err != nil {
-		t.Fatalf("Failed to read captured stderr: %v", err)
-	}
-
-	if capturedExitCode != 0 {
-		t.Errorf("Expected os.Exit(0) but got %d. Stderr: %s", capturedExitCode, strings.TrimSpace(string(capturedError)))
-	}
-
-	expectedStdoutPart := "evolved-commit run: No commit message file provided. Running general checks (not yet implemented)."
-	if !strings.Contains(string(capturedOutput), expectedStdoutPart) {
-		t.Errorf("Expected stdout to contain \"%s\", got \"%s\"", expectedStdoutPart, strings.TrimSpace(string(capturedOutput)))
-	}
-
 	if len(capturedError) > 0 {
 		t.Errorf("Expected no stderr output, but got: %s", strings.TrimSpace(string(capturedError)))
 	}

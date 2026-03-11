@@ -39,32 +39,33 @@ func runCommandLogic(cmd *cobra.Command, args []string, exit func(code int)) {
 		commitMessage := string(content)
 		subjectLine := strings.SplitN(commitMessage, "\n", 2)[0] // Get the first line
 
-		// Run subject not empty check
+		var failures []error // Collect all failures
+
+		// Run commit message subject checks
 		if err := checks.CheckCommitMessageSubjectNotEmpty(subjectLine); err != nil {
-			fmt.Fprintf(os.Stderr, "Commit message check failed:\n%v\n", err)
-			exit(1)
-			return
+			failures = append(failures, err)
 		}
-		// Run subject length check
 		if err := checks.CheckCommitMessageSubjectLength(subjectLine); err != nil {
-			fmt.Fprintf(os.Stderr, "Commit message check failed:\n%v\n", err)
-			exit(1)
-			return
+			failures = append(failures, err)
 		}
-		// Run subject no trailing period check
 		if err := checks.CheckCommitMessageSubjectNoTrailingPeriod(subjectLine); err != nil {
-			fmt.Fprintf(os.Stderr, "Commit message check failed:\n%v\n", err)
-			exit(1)
-			return
+			failures = append(failures, err)
 		}
-		// Run subject starts with uppercase check
 		if err := checks.CheckCommitMessageSubjectStartsWithUppercase(subjectLine); err != nil {
-			fmt.Fprintf(os.Stderr, "Commit message check failed:\n%v\n", err)
+			failures = append(failures, err)
+		}
+
+		// Report all collected failures or exit successfully
+		if len(failures) > 0 {
+			fmt.Fprintln(os.Stderr, "Commit message checks failed:")
+			for _, failure := range failures {
+				fmt.Fprintf(os.Stderr, "- %v\n", failure)
+			}
 			exit(1)
 			return
 		}
 
-		exit(0)
+		exit(0) // All checks passed
 		return
 	}
 

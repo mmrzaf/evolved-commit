@@ -32,3 +32,5 @@ All notable changes to this project are documented here.
 - Introduce `CheckCommitMessageSubjectNoTrailingPeriod` rule, integrate into `run` command, and add its explanation to `explain` subcommand.
 
 - Introduce `CheckCommitMessageSubjectStartsWithUppercase` rule, integrate into `run` command, and add its explanation to `explain` subcommand.
+
+- Refactor `run` command to report all commit message check failures simultaneously, instead of exiting on the first error.

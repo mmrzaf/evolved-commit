@@ -20,7 +20,8 @@ Usage:
   evolved-commit explain commit-message-subject-not-empty
   evolved-commit explain commit-message-subject-length
   evolved-commit explain commit-message-subject-no-trailing-period
-  evolved-commit explain commit-message-subject-starts-with-uppercase`,
+  evolved-commit explain commit-message-subject-starts-with-uppercase
+  evolved-commit explain commit-message-subject-imperative`,
 	Args: cobra.ExactArgs(1), // Expect exactly one argument: the rule name
 	Run: func(cmd *cobra.Command, args []string) {
 		explainCommandLogic(cmd, args, os.Exit)
@@ -117,6 +118,33 @@ Example:
   (This is correct)
   git commit -m "Fix: Correct critical bug"
   (This is correct)`) 
+			exit(0)
+		case "commit-message-subject-imperative":
+			fmt.Println(`Rule: Commit Message Subject Imperative Mood
+
+Purpose:
+A commit message subject should describe the change in the imperative mood,
+as if giving a command or instruction. This means it should start with an
+action verb in its base form.
+
+Why it's important:
+Using the imperative mood ("Fix bug", "Add feature") makes commit history
+consistent, easier to read, and aligns with how Git itself phrases merge
+commits ("Merge branch 'feature'"). It clarifies what the commit *does*,
+rather than what it *did* or *does*.
+
+How to fix:
+Rephrase the first word of your commit message subject to be an imperative
+verb. Avoid past tense (-ed), third-person singular (-s), or present participle (-ing).
+
+Example:
+  git commit -m "feat: adds user authentication" (Incorrect: "adds")
+  git commit -m "feat: Added user authentication" (Incorrect: "Added")
+  git commit -m "feat: Adding user authentication" (Incorrect: "Adding")
+  git commit -m "feat: Add user authentication" (Correct)
+
+  git commit -m "fix: corrected a critical bug" (Incorrect: "corrected")
+  git commit -m "fix: Correct a critical bug" (Correct)`) 
 			exit(0)
 		default:
 			fmt.Fprintf(os.Stderr, "Error: Unknown rule '%s'. Use 'evolved-commit explain --help' for available rules.\n", ruleName)

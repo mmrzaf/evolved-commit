@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Introduce `CheckCommitMessageSubjectImperative` rule, integrate into `run` command, and add its explanation to `explain` subcommand.
 - Introduce `CheckCommitMessageSubjectStartsWithUppercase` rule, integrate into `run` command, and add its explanation to `explain` subcommand.
 - Introduce `CheckCommitMessageSubjectNoTrailingPeriod` rule, integrate into `run` command, and add its explanation to `explain` subcommand.
 - Introduce `CheckCommitMessageSubjectLength` rule, integrate into `run` command, and add its explanation to `explain` subcommand.
@@ -34,3 +35,5 @@ All notable changes to this project are documented here.
 - Introduce `CheckCommitMessageSubjectStartsWithUppercase` rule, integrate into `run` command, and add its explanation to `explain` subcommand.
 
 - Refactor `run` command to report all commit message check failures simultaneously, instead of exiting on the first error.
+
+- Introduce `CheckCommitMessageSubjectImperative` rule, integrate into `run` command, and add its explanation to `explain` subcommand.

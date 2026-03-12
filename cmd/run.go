@@ -54,6 +54,9 @@ func runCommandLogic(cmd *cobra.Command, args []string, exit func(code int)) {
 		if err := checks.CheckCommitMessageSubjectStartsWithUppercase(subjectLine); err != nil {
 			failures = append(failures, err)
 		}
+		if err := checks.CheckCommitMessageSubjectImperative(subjectLine); err != nil {
+			failures = append(failures, err)
+		}
 
 		// Report all collected failures or exit successfully
 		if len(failures) > 0 {
